@@ -19,4 +19,6 @@ func main() {
 	for scanner.Scan() {
 		println(scanner.Text())
 	}
+
+	print("done")
 }
