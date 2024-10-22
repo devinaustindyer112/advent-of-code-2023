@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -16,34 +18,28 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(file)
+	sum:= 0.0
 
-	sum:= 0
 	for i:=1;  scanner.Scan(); i++ {
-
-		// The issue is that I'm looking at the total of the game, not each round
 		game := parseGame(scanner.Text())
-		if isValid(game) {
-
-			println(i)
-
-			sum += i
-		}
+		power := game["red"] * game["blue"] * game["green"]
+		sum += power
 	}
 
-	print(sum)
+	fmt.Printf("%f\n", sum)
 }
 
-func parseGame(line string) map[string]int {
+func parseGame(line string) map[string]float64 {
 
 	gameString := line[strings.Index(line, ":"):]
 	rounds := strings.Split(gameString, ";")
-	roundsMap := map[string]int{}
+	roundsMap := map[string]float64{}
 
 	for _, round := range rounds {
 		drawsMap := parseRound(round)
-		roundsMap["red"] = roundsMap["red"] + drawsMap["red"]
-		roundsMap["blue"] = roundsMap["blue"] + drawsMap["blue"]
-		roundsMap["green"] = roundsMap["green"] + drawsMap["green"]
+		roundsMap["red"] = math.Max(float64(roundsMap["red"]), float64(drawsMap["red"]))
+		roundsMap["blue"] = math.Max(float64(roundsMap["blue"]), float64(drawsMap["blue"]))
+		roundsMap["green"] = math.Max(float64(roundsMap["green"]), float64(drawsMap["green"]))
 	}
 
 	return roundsMap
@@ -53,7 +49,6 @@ func parseRound(round string) map[string]int  {
 
 	draws := strings.Split(round, ",")
 	drawsMap := map[string]int {}
-
 	colorRegex, _ := regexp.Compile("red|green|blue")
 	numberRegex, _ := regexp.Compile("[0-9]+")
 
@@ -69,5 +64,3 @@ func parseRound(round string) map[string]int  {
 func isValid(game map[string]int) bool {
 	return game["red"] <= 12 && game["green"] <= 13 && game["blue"] <= 14 
 }
-
-// Which games possible with only 12 red cubes, 13 green cubes, and 14 blue cubes?
