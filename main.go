@@ -22,37 +22,38 @@ func day_3_part_1(scanner *bufio.Scanner) {
 	scanner.Scan()
 	nextLine := scanner.Text()
 
-	var sum int
+	sum := 0
 
-	for currentLine != "" {
+	for j := 0; currentLine != ""; j++ {
 
 		indexes := indexPartNumbers(currentLine)
 
 		// Just pass in the string that we want to inspect for each case, then have a simple function that checks for the values
 		for i := 0; i < len(indexes); i++ {
-			if adjacentHorizontal(indexes[i][0], indexes[i][1], currentLine) {
-				sum += stringToInt(currentLine[indexes[i][0]:indexes[i][1]])
-				print(stringToInt(currentLine[indexes[i][0]:indexes[i][1]]))
-			} else if adjacentVertical(indexes[i][0], indexes[i][1], previousLine) {
-				sum += stringToInt(currentLine[indexes[i][0]:indexes[i][1]])
-				print(stringToInt(currentLine[indexes[i][0]:indexes[i][1]]))
-			} else if adjacentVertical(indexes[i][0], indexes[i][1], nextLine) {
-				sum += stringToInt(currentLine[indexes[i][0]:indexes[i][1]])
-				print(stringToInt(currentLine[indexes[i][0]:indexes[i][1]]))
+			if adjacentHorizontal(indexes[i][0], indexes[i][1], currentLine) ||
+				adjacentVertical(indexes[i][0], indexes[i][1], previousLine) ||
+				adjacentVertical(indexes[i][0], indexes[i][1], nextLine) {
+
+				number := stringToInt(string(currentLine[indexes[i][0]:indexes[i][1]]))
+				sum = sum + number
+
+				if j == 139 {
+					println(number)
+				}
+
 			}
-
-			print("-")
 		}
+		// println(" Done")
 
-		println("")
-
-		scanner.Scan()
 		previousLine = currentLine
 		currentLine = nextLine
+		scanner.Scan()
 		nextLine = scanner.Text()
+
 	}
 
 	println(sum)
+
 }
 
 func indexPartNumbers(search string) [][]int {
@@ -60,22 +61,19 @@ func indexPartNumbers(search string) [][]int {
 	return regex.FindAllStringIndex(search, -1)
 }
 
+// Something is wrong with these
 func adjacentHorizontal(startIndex int, endIndex int, currentLine string) bool {
-	if startIndex == 0 {
-		return false
+	if startIndex != 0 {
+		startIndex--
 	}
 
-	regex, _ := regexp.Compile("[^.]")
-
-	if regex.MatchString(string(currentLine[startIndex-1])) {
-		return true
+	if endIndex != len(currentLine) {
+		endIndex++
 	}
 
-	if endIndex == len(currentLine) {
-		return false
-	}
+	regex, _ := regexp.Compile("[^0-9.]+")
 
-	return regex.MatchString(string(currentLine[endIndex : endIndex+1]))
+	return regex.MatchString(string(currentLine[startIndex:endIndex]))
 }
 
 func adjacentVertical(startIndex int, endIndex int, currentLine string) bool {
@@ -91,7 +89,7 @@ func adjacentVertical(startIndex int, endIndex int, currentLine string) bool {
 		endIndex++
 	}
 
-	regex, _ := regexp.Compile("[^.]+")
+	regex, _ := regexp.Compile("[^0-9.]+")
 
 	return regex.MatchString(string(currentLine[startIndex:endIndex]))
 }
