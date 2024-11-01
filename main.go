@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 func main() {
@@ -13,71 +14,89 @@ func main() {
 }
 
 func day_3_part_1(scanner *bufio.Scanner) {
+
 	var previousLine string
+
 	scanner.Scan()
 	currentLine := scanner.Text()
 	scanner.Scan()
 	nextLine := scanner.Text()
 
+	var sum int
+
 	for currentLine != "" {
 
-		indexes := numberIndexes(currentLine)
+		indexes := indexPartNumbers(currentLine)
 
+		// Just pass in the string that we want to inspect for each case, then have a simple function that checks for the values
 		for i := 0; i < len(indexes); i++ {
-			if adjacentLeft(indexes[i][0], currentLine) {
-				println(currentLine[indexes[i][0]:indexes[i][1]])
+			if adjacentHorizontal(indexes[i][0], indexes[i][1], currentLine) {
+				sum += stringToInt(currentLine[indexes[i][0]:indexes[i][1]])
+				print(stringToInt(currentLine[indexes[i][0]:indexes[i][1]]))
+			} else if adjacentVertical(indexes[i][0], indexes[i][1], previousLine) {
+				sum += stringToInt(currentLine[indexes[i][0]:indexes[i][1]])
+				print(stringToInt(currentLine[indexes[i][0]:indexes[i][1]]))
+			} else if adjacentVertical(indexes[i][0], indexes[i][1], nextLine) {
+				sum += stringToInt(currentLine[indexes[i][0]:indexes[i][1]])
+				print(stringToInt(currentLine[indexes[i][0]:indexes[i][1]]))
 			}
-			if adjacentRight(indexes[i][1], currentLine) {
-				println(currentLine[indexes[i][0]:indexes[i][1]])
-			}
-			if adjacentAbove(indexes[i][0], indexes[i][1], previousLine) {
-				println(currentLine[indexes[i][0]:indexes[i][1]])
-			}
-			if adjacentBelow(indexes[i][0], indexes[i][1], nextLine) {
-				println(currentLine[indexes[i][0]:indexes[i][1]])
-			}
+
+			print("-")
 		}
+
+		println("")
 
 		scanner.Scan()
 		previousLine = currentLine
 		currentLine = nextLine
 		nextLine = scanner.Text()
 	}
+
+	println(sum)
 }
 
-func numberIndexes(search string) [][]int {
+func indexPartNumbers(search string) [][]int {
 	regex, _ := regexp.Compile("[0-9]+")
 	return regex.FindAllStringIndex(search, -1)
 }
 
-func adjacentLeft(startIndex int, currentLine string) bool {
+func adjacentHorizontal(startIndex int, endIndex int, currentLine string) bool {
 	if startIndex == 0 {
 		return false
 	}
 
-	regex, _ := regexp.Compile("[^0-9.]+")
+	regex, _ := regexp.Compile("[^.]")
 
-	return regex.MatchString(string(currentLine[startIndex-1]))
-}
+	if regex.MatchString(string(currentLine[startIndex-1])) {
+		return true
+	}
 
-func adjacentRight(endIndex int, currentLine string) bool {
 	if endIndex == len(currentLine) {
 		return false
 	}
 
-	regex, _ := regexp.Compile("[^0-9.]+")
-
-	return regex.MatchString(string(currentLine[endIndex]))
+	return regex.MatchString(string(currentLine[endIndex : endIndex+1]))
 }
 
-func adjacentAbove(startIndex int, endIndex int, previousLine string) bool {
-	if previousLine == "" {
+func adjacentVertical(startIndex int, endIndex int, currentLine string) bool {
+	if currentLine == "" {
 		return false
 	}
 
-	return false
+	if startIndex != 0 {
+		startIndex--
+	}
+
+	if endIndex != len(currentLine) {
+		endIndex++
+	}
+
+	regex, _ := regexp.Compile("[^.]+")
+
+	return regex.MatchString(string(currentLine[startIndex:endIndex]))
 }
 
-func adjacentBelow(startIndex int, endIndex int, nextLine string) bool {
-	return false
+func stringToInt(str string) int {
+	number, _ := strconv.Atoi(str)
+	return number
 }
