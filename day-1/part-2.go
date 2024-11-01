@@ -23,7 +23,7 @@ func main() {
 		second, _ := findLast(scanner.Text())
 		sum += first + second
 	}
-	
+
 	print(sum)
 }
 
@@ -45,33 +45,33 @@ func findFirst(str string) (int, error) {
 	for i := 0; i < len(str); i++ {
 
 		if str[i] >= 48 && str[i] <= 57 {
-			digit, _ := strconv.Atoi(string(str[i])) 
+			digit, _ := strconv.Atoi(string(str[i]))
 			return digit * 10, nil
 		}
 
 		for key, _ := range stringsToDigits {
 			if strings.HasPrefix(str[i:], key) {
 				return stringsToDigits[key] * 10, nil
-			} 
+			}
 		}
- 	}
+	}
 
 	return -1, errors.New("sucks to suck")
 }
 
 func findLast(str string) (int, error) {
 
-	for i := len(str) - 1; i >= 0; i--  {
+	for i := len(str) - 1; i >= 0; i-- {
 
 		if str[i] >= 48 && str[i] <= 57 {
-			digit, _ := strconv.Atoi(string(str[i])) 
+			digit, _ := strconv.Atoi(string(str[i]))
 			return digit, nil
 		}
 
 		for key, _ := range stringsToDigits {
 			if strings.HasPrefix(str[i:], key) {
 				return stringsToDigits[key], nil
-			} 
+			}
 		}
 	}
 
