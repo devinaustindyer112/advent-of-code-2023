@@ -1,27 +1,22 @@
 package main
 
 import (
-	"os"
 	"regexp"
 	"strconv"
 )
 
-func main() {
-	file, _ := os.ReadFile("./input.txt")
-	day_3_part_2(string(file))
-}
-
-// Pretty sure we can use a map and make this more effiecent
-
-func day_3_part_2(file string) {
-	symbolIndexes := indexRegex(file, "[^[:space:]0-9.]+")
-	partIndexes := indexRegex(file, "[0-9]+")
-	adjacent := getAdjecentParts(symbolIndexes, partIndexes)
+func day_3_part_2(file []byte) {
+	fileStr := string(file)
+	symbolIndexes := indexRegex(fileStr, "[^[:space:]0-9.]+")
+	partIndexes := indexRegex(fileStr, "[0-9]+")
+	gearRatios := getGearRatios(symbolIndexes, partIndexes)
 	sum := 0
 
-	for i := 0; i < len(adjacent); i++ {
-		number := stringToInt(file[adjacent[i][0]:adjacent[i][1]])
-		sum += number
+	for i := 0; i < len(gearRatios); i += 2 {
+		// Get next two gears, multiply and add
+		partFirst := stringToInt(fileStr[gearRatios[i][0]:gearRatios[i][1]])
+		partSecond := stringToInt(fileStr[gearRatios[i+1][0]:gearRatios[i+1][1]])
+		sum += partFirst * partSecond
 	}
 
 	println(sum)
@@ -32,38 +27,30 @@ func indexRegex(search string, regexStr string) [][]int {
 	return regex.FindAllStringIndex(search, -1)
 }
 
-func getAdjecentParts(symbolsIndex [][]int, partsIndex [][]int) [][]int {
-	var adjacent [][]int
+func getGearRatios(symbolIndexes [][]int, partIndexes [][]int) [][]int {
+	gears := [][]int{}
 
-	for i := 0; i < len(partsIndex); i++ {
-		for j := 0; j < len(symbolsIndex); j++ {
-			if isAdjacent(symbolsIndex[j], partsIndex[i]) {
-				adjacent = append(adjacent, partsIndex[i])
-				break
+	for i := 0; i < len(symbolIndexes); i++ {
+		adjacent := [][]int{}
+
+		for j := 0; j < len(partIndexes); j++ {
+			if isAdjacent(symbolIndexes[i], partIndexes[j]) {
+				adjacent = append(adjacent, partIndexes[j])
 			}
+		}
+		if len(adjacent) == 2 {
+			gears = append(gears, adjacent...)
 		}
 	}
 
-	return adjacent
+	return gears
 }
 
+// Checks the previous, current and next line for adjacent symbols
 func isAdjacent(symbolIndex []int, partIndex []int) bool {
-	// Check previous line
-	if symbolIndex[0] >= partIndex[0]-1-141 && symbolIndex[1] <= partIndex[1]+1-141 {
-		return true
-	}
-
-	// Check current line
-	if symbolIndex[0] >= partIndex[0]-1 && symbolIndex[1] <= partIndex[1]+1 {
-		return true
-	}
-
-	// Check next line
-	if symbolIndex[0] >= partIndex[0]-1+141 && symbolIndex[1] <= partIndex[1]+1+141 {
-		return true
-	}
-
-	return false
+	return symbolIndex[0] >= partIndex[0]-1-141 && symbolIndex[1] <= partIndex[1]+1-141 ||
+		symbolIndex[0] >= partIndex[0]-1 && symbolIndex[1] <= partIndex[1]+1 ||
+		symbolIndex[0] >= partIndex[0]-1+141 && symbolIndex[1] <= partIndex[1]+1+141
 }
 
 func stringToInt(str string) int {
