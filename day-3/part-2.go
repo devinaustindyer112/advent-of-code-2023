@@ -1,9 +1,4 @@
-package main
-
-import (
-	"regexp"
-	"strconv"
-)
+package day_3
 
 func day_3_part_2(file []byte) {
 	fileStr := string(file)
@@ -20,11 +15,6 @@ func day_3_part_2(file []byte) {
 	}
 
 	println(sum)
-}
-
-func indexRegex(search string, regexStr string) [][]int {
-	regex, _ := regexp.Compile(regexStr)
-	return regex.FindAllStringIndex(search, -1)
 }
 
 func getGearRatios(symbolIndexes [][]int, partIndexes [][]int) [][]int {
@@ -44,16 +34,4 @@ func getGearRatios(symbolIndexes [][]int, partIndexes [][]int) [][]int {
 	}
 
 	return gears
-}
-
-// Checks the previous, current and next line for adjacent symbols
-func isAdjacent(symbolIndex []int, partIndex []int) bool {
-	return symbolIndex[0] >= partIndex[0]-1-141 && symbolIndex[1] <= partIndex[1]+1-141 ||
-		symbolIndex[0] >= partIndex[0]-1 && symbolIndex[1] <= partIndex[1]+1 ||
-		symbolIndex[0] >= partIndex[0]-1+141 && symbolIndex[1] <= partIndex[1]+1+141
-}
-
-func stringToInt(str string) int {
-	number, _ := strconv.Atoi(str)
-	return number
 }
