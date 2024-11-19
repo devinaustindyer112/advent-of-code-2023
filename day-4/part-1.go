@@ -1,9 +1,8 @@
-package main
+package day_4
 
 import (
 	"fmt"
 	"math"
-	"os"
 	"slices"
 	"strings"
 )
@@ -11,11 +10,6 @@ import (
 type Game struct {
 	numbers        []string
 	winningNumbers []string
-}
-
-func main() {
-	input, _ := os.ReadFile("./input.txt")
-	day_4_part_1(string(input))
 }
 
 func day_4_part_1(input string) {
