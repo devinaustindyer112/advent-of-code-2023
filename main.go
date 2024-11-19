@@ -2,77 +2,75 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
-	"slices"
+	"regexp"
 	"strings"
 )
 
-type Game struct {
-	numbers        []string
-	winningNumbers []string
+type Node struct {
+	Value    string
+	Range    []string
+	Children []*Node
+}
+
+func (n *Node) add(child Node) {
+	if len(n.Children) == 0 {
+		n.Children = append(n.Children, &child)
+	}
+}
+
+func (n *Node) countChildren() int {
+	return len(n.Children)
 }
 
 func main() {
 	input, _ := os.ReadFile("./input.txt")
-	day_4_part_1(string(input))
+	day_5_part_1(string(input))
 }
 
-func day_4_part_1(input string) {
-	games := parseGames(input)
-	assert(len(games) == 199, fmt.Sprintf("Did not parse games properly. Game count: %d", len(games)))
+// This seems like a graph problem
+// Every entity maps only to a single entity. I don't believe we need to account for overlapping.
 
-	sum := 0.0
-	for i := 0; i < len(games); i++ {
-		points := calculatePoints(games[i])
-		println(fmt.Sprintf("Game %d: %f", i+1, points))
-		sum += points
+func day_5_part_1(input string) {
+	// Parse seeds
+	// Parse soil
+	// Find lowest value for soil.
+	// Implement the rest of the solution
+
+	regex := regexp.MustCompile(`(?m)^\s*$`)
+	sections := regex.Split(input, -1)
+	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
+
+	root := Node{
+		Value: "root",
 	}
 
-	println(fmt.Sprintf("%f", sum))
+	mapSeeds(&root, sections[0])
+	assert(root.countChildren() == 20, fmt.Sprintf("Children length incorrect: %d", root.countChildren()))
 }
 
-func parseGames(input string) []Game {
-	games := []Game{}
-	lines := strings.Split(input, "\n")
-	assert(len(lines) == 200, fmt.Sprintf("Did not split input properly. Line count: %d", len(lines)))
+func mapSeeds(root *Node, input string) {
+	inputSplit := strings.Split(input, ":")
+	assert(len(inputSplit) == 2, fmt.Sprintf("Split input length incorrect: %d", len(inputSplit)))
 
-	// We don't want to parse the last "line". It is empty.
-	for i := 0; i < len(lines)-1; i++ {
-		games = append(games, parseGame(lines[i]))
-	}
-	assert(len(games) == 199, fmt.Sprintf("Did not parse games properly. Game count: %d", len(games)))
+	seeds := strings.Split(strings.Trim(inputSplit[1], " "), " ")
+	assert(len(seeds) == 20, fmt.Sprintf("Seeds length incorrect: %d", len(seeds)))
 
-	return games
-}
-
-func parseGame(inputLine string) Game {
-	numbers := strings.Fields(inputLine[strings.Index(inputLine, ":")+1 : strings.Index(inputLine, "|")])
-	winningNumbers := strings.Fields(inputLine[strings.Index(inputLine, "|")+1:])
-
-	assert(len(numbers) == 10, fmt.Sprintf("Did not parse numbers correctly. Length: %d", len(numbers)))
-	assert(len(winningNumbers) == 25, fmt.Sprintf("Did not parse winningNumbers properly. Length: %d", len(winningNumbers)))
-
-	return Game{
-		numbers,
-		winningNumbers,
-	}
-}
-
-func calculatePoints(game Game) float64 {
-	matchingCount := 0
-
-	for i := 0; i < len(game.numbers); i++ {
-		if slices.Contains(game.winningNumbers, game.numbers[i]) {
-			matchingCount++
+	for _, seed := range seeds {
+		child := Node{
+			Value: seed,
 		}
+		root.add(child)
 	}
+}
 
-	if matchingCount == 0 {
-		return 0
-	}
+func mapSoil(root *Node, input string) {
+	inputSplit := strings.Split(input, ":")
+	assert(len(inputSplit) == 2, fmt.Sprintf("Split input length incorrect: %d", len(inputSplit)))
 
-	return math.Pow(2, float64(matchingCount-1))
+	regex := regexp.MustCompile(`\n$`)
+	soilMap := regex.Split(inputSplit[1], -1)
+
 }
 
 func assert(condition bool, errMessage string) {
