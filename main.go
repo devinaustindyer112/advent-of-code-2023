@@ -4,38 +4,59 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 )
+
+type MapEntry struct {
+	DestinationStart int
+	OriginStart      int
+	RangeLength      int
+}
 
 func main() {
 	input, _ := os.ReadFile("./input.txt")
 	day_5_part_1(string(input))
 }
 
-// NAIVE SOLUTION FIRST DUMMY!! THEN YOU CAN OPTOMIZE
+// For novel problems, niave solution first!
+// Understand the problem fully before trying to complete it
 
 func day_5_part_1(input string) {
 	regex := regexp.MustCompile(`(?m)^\s*$`)
 	sections := regex.Split(input, -1)
 	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-	sectionSplit := strings.Split(sections[0], ":")
-	assert(len(sectionSplit) == 2, fmt.Sprintf("Split input length incorrect: %d", len(sectionSplit)))
-
-	seeds := strings.Split(strings.Trim(sectionSplit[1], " "), " ")
-	assert(len(seeds) == 20, fmt.Sprintf("Input values length incorrect: %d", len(seeds)))
+	seeds := strings.Split(strings.Trim(strings.Split(sections[0], ":")[1], " "), " ")
+	assert(len(seeds) == 20, fmt.Sprintf("Seeds length incorrect: %d", len(seeds)))
 
 	parseMap(sections[1])
+
+	// Start with a single map and getting the appropriate values
+
 }
 
-func parseMap(input string) {
-	inputSplit := strings.Split(input, ":")
-	assert(len(inputSplit) == 2, fmt.Sprintf("Split input length incorrect: %d", len(inputSplit)))
+func parseMap(section string) {
+	entriesList := strings.Split(strings.Trim(strings.Split(strings.Trim(section, "\n"), ":")[1], "\n"), "\n")
+	assert(len(entriesList) == 23, fmt.Sprintf("Map values incorrect length %d", len(entriesList)))
 
-	// Need to trim withspace
+	var entriesMap []MapEntry
+	for _, entry := range entriesList {
+		entryValues := strings.Split(entry, " ")
+		entriesMap = append(entriesMap, MapEntry{
+			DestinationStart: parseInt(entryValues[0]),
+			OriginStart:      parseInt(entryValues[1]),
+			RangeLength:      parseInt(entryValues[2]),
+		})
+	}
+}
 
-	values := strings.Split(inputSplit[1], "\n")
-	assert(len(values) == 23, fmt.Sprintf("Map values incorrect length %d", len(values)))
+func parseInt(str string) int {
+	value, err := strconv.Atoi(str)
+	if err != nil {
+		panic("error parsing string to int")
+	}
+	return value
 }
 
 func assert(condition bool, errMessage string) {
