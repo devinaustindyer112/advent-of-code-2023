@@ -76,9 +76,11 @@ func getDestinationValue(originValue int, toMap []MapEntry) int {
 
 		// It was going so slow because we were parsing to ints here! Event when we didnt have to!
 		for i := 0; i < to.RangeLength; i++ {
+
 			if to.OriginStart+i == originValue {
 				return to.DestinationStart + i
 			}
+
 		}
 
 	}
@@ -98,6 +100,7 @@ func isWithinRange(seed int, mapEntry MapEntry) bool {
 func parseSeeds(section string) []int {
 	seedStrings := regexp.MustCompile(`[0-9]+`).FindAllString(section, -1)
 	var seedIntegers []int
+
 	for _, seed := range seedStrings {
 		seedIntegers = append(seedIntegers, parseInt(seed))
 	}
