@@ -27,22 +27,32 @@ func day_5_part_1(input string) {
 	sections := regex.Split(input, -1)
 	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-	seeds := regexp.MustCompile(`[0-9]+`).FindAllString(sections[0], -1)
+	seeds := parseSeeds(sections[0])
 	assert(len(seeds) == 20, fmt.Sprintf("Seeds length incorrect: %d", len(seeds)))
 
 	seedToSoilMap := parseMap(sections[1])
+	soilToFertilizerMap := parseMap(sections[2])
 
 	soils := getSoils(seeds, seedToSoilMap)
 	assert(len(soils) >= 0, fmt.Sprintf("Invalid soils length %d", soils))
 
+	fertilizers := getSoils(soils, soilToFertilizerMap)
+
+	println("soils:")
 	for _, soil := range soils {
 		println(soil)
+	}
+
+	println("----------------------")
+	println("fertilizers")
+	for _, fertilizer := range fertilizers {
+		println(fertilizer)
 	}
 
 	// Start with a single map and getting the lowest value.
 }
 
-func getSoils(seeds []string, seedToSoilArray []MapEntry) []int {
+func getSoils(seeds []int, seedToSoilArray []MapEntry) []int {
 
 	var soils []int
 	for _, seed := range seeds {
@@ -53,16 +63,16 @@ func getSoils(seeds []string, seedToSoilArray []MapEntry) []int {
 	return soils
 }
 
-func getSoil(seed string, seedToSoilArray []MapEntry) int {
+func getSoil(seed int, seedToSoilArray []MapEntry) int {
 
 	for _, seedToSoil := range seedToSoilArray {
 
-		if !isWithinRange(parseInt(seed), seedToSoil) {
+		if !isWithinRange(seed, seedToSoil) {
 			continue
 		}
 
 		for i := 0; i < seedToSoil.RangeLength; i++ {
-			if seedToSoil.OriginStart+i == parseInt(seed) {
+			if seedToSoil.OriginStart+i == seed {
 				return seedToSoil.DestinationStart + i
 			}
 		}
@@ -81,9 +91,18 @@ func isWithinRange(seed int, mapEntry MapEntry) bool {
 	return false
 }
 
+func parseSeeds(section string) []int {
+	seedStrings := regexp.MustCompile(`[0-9]+`).FindAllString(section, -1)
+	var seedIntegers []int
+	for _, seed := range seedStrings {
+		seedIntegers = append(seedIntegers, parseInt(seed))
+	}
+
+	return seedIntegers
+}
+
 func parseMap(section string) []MapEntry {
 	entriesList := strings.Split(strings.Trim(strings.Split(strings.Trim(section, "\n"), ":")[1], "\n"), "\n")
-	assert(len(entriesList) == 23, fmt.Sprintf("Map entries incorrect length %d", len(entriesList)))
 	var entriesMap []MapEntry
 
 	for _, entry := range entriesList {
@@ -94,7 +113,6 @@ func parseMap(section string) []MapEntry {
 			RangeLength:      parseInt(entryValues[2]),
 		})
 	}
-	assert(len(entriesMap) == 23, fmt.Sprintf("Map entry slice incorrect length %d", len(entriesMap)))
 
 	return entriesMap
 }
