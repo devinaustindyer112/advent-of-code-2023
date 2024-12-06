@@ -33,18 +33,20 @@ func day_5_part_1(input string) {
 	seedToSoilMap := parseMap(sections[1])
 	soilToFertilizerMap := parseMap(sections[2])
 
-	soils := getSoils(seeds, seedToSoilMap)
+	soils := getDestinationValues(seeds, seedToSoilMap)
 	assert(len(soils) >= 0, fmt.Sprintf("Invalid soils length %d", soils))
 
-	fertilizers := getSoils(soils, soilToFertilizerMap)
+	fertilizers := getDestinationValues(soils, soilToFertilizerMap)
 
 	println("soils:")
+
 	for _, soil := range soils {
 		println(soil)
 	}
 
 	println("----------------------")
 	println("fertilizers")
+
 	for _, fertilizer := range fertilizers {
 		println(fertilizer)
 	}
@@ -52,28 +54,30 @@ func day_5_part_1(input string) {
 	// Start with a single map and getting the lowest value.
 }
 
-func getSoils(seeds []int, seedToSoilArray []MapEntry) []int {
+func getDestinationValues(originValues []int, toMap []MapEntry) []int {
 
-	var soils []int
-	for _, seed := range seeds {
-		soil := getSoil(seed, seedToSoilArray)
-		soils = append(soils, soil)
+	var destinationValues []int
+
+	for _, originValue := range originValues {
+		soil := getDestinationValue(originValue, toMap)
+		destinationValues = append(destinationValues, soil)
 	}
 
-	return soils
+	return destinationValues
 }
 
-func getSoil(seed int, seedToSoilArray []MapEntry) int {
+func getDestinationValue(originValue int, toMap []MapEntry) int {
 
-	for _, seedToSoil := range seedToSoilArray {
+	for _, to := range toMap {
 
-		if !isWithinRange(seed, seedToSoil) {
+		if !isWithinRange(originValue, to) {
 			continue
 		}
 
-		for i := 0; i < seedToSoil.RangeLength; i++ {
-			if seedToSoil.OriginStart+i == seed {
-				return seedToSoil.DestinationStart + i
+		// It was going so slow because we were parsing to ints here! Event when we didnt have to!
+		for i := 0; i < to.RangeLength; i++ {
+			if to.OriginStart+i == originValue {
+				return to.DestinationStart + i
 			}
 		}
 
