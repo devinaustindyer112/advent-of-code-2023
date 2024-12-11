@@ -39,15 +39,6 @@ func day_5_part_2(input string) {
 	seedMap := parseSeeds(sections[0])
 	assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
 
-	var seeds []int
-	for i := 0; i < len(seedMap); i++ {
-		for j := 0; j < int(seedMap[i].RangeLength); j++ {
-			seeds = append(seeds, seedMap[i].Start+j)
-		}
-	}
-
-	println(fmt.Sprintf("len: %d", len(seeds)))
-
 	// Can probably be converted to a for loop
 	seedToSoilMap := parseMap(sections[1])
 	soilToFertilizerMap := parseMap(sections[2])
@@ -63,6 +54,11 @@ func day_5_part_2(input string) {
 	// This is SLOOWWW for part 2. Probably need to find a new way to solve this part.
 	// Yeah, shes just dying on me.
 	// I need to figure out a completely different strategy for this.
+
+	// I don't think I need to store indiviual values. I can pass ranges. Once I have the final range, I can determine the lowest value.
+	// Instead of passin indivual seeds, I can pass the ranges. So given seed range, return the appropriate map ranges
+	// Iterating through the seeds is the biggest slowdown here, and comparing to each range.
+
 	soils := getDestinationValues(seeds, seedToSoilMap)
 	fertilizers := getDestinationValues(soils, soilToFertilizerMap)
 	waters := getDestinationValues(fertilizers, fertilizerToWaterMap)
@@ -72,6 +68,14 @@ func day_5_part_2(input string) {
 	locations := getDestinationValues(humidities, humidityToLocation)
 
 	println(slices.Min(locations))
+}
+
+func getDestinationRange() {
+
+}
+
+func getDestinationRanges() {
+
 }
 
 func getDestinationValues(originValues []int, toMap []MapEntry) []int {
