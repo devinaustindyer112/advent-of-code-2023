@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -23,12 +22,6 @@ func main() {
 
 // For novel problems, niave solution first!
 // Understand the problem fully before trying to complete it!
-
-// I'm missing something here...
-// Oh shit... this is what I'm missing 8)
-// Any source numbers that aren't mapped correspond to the same destination number. So, seed number 10 corresponds to soil number 10.
-
-// Too high: 434238611
 
 func day_5_part_1(input string) {
 
@@ -67,18 +60,14 @@ func getDestinationValues(originValues []int64, toMap []MapEntry) []int64 {
 	var destinationValues []int64
 
 	for _, originValue := range originValues {
-		destinationValue, err := getDestinationValue(originValue, toMap)
-		if err != nil {
-			continue
-		}
-
+		destinationValue := getDestinationValue(originValue, toMap)
 		destinationValues = append(destinationValues, destinationValue)
 	}
 
 	return destinationValues
 }
 
-func getDestinationValue(originValue int64, toMap []MapEntry) (int64, error) {
+func getDestinationValue(originValue int64, toMap []MapEntry) int64 {
 
 	for _, to := range toMap {
 
@@ -86,18 +75,18 @@ func getDestinationValue(originValue int64, toMap []MapEntry) (int64, error) {
 			continue
 		}
 
-		// I can do this much more efficiently. Still not sure why it's not working this way. Gonna try to figure that out.
+		// I can do this much more efficiently
 		for i := int64(0); i < to.RangeLength; i++ {
 
 			if to.OriginStart+i == originValue {
-				return to.DestinationStart + i, nil
+				return to.DestinationStart + i
 			}
 
 		}
 
 	}
 
-	return 0, errors.New("didn't find nothing")
+	return originValue
 }
 
 func isWithinRange(originValue int64, mapEntry MapEntry) bool {
@@ -165,7 +154,7 @@ func testGetDestinationFromValue() {
 		},
 	}
 
-	value, _ := getDestinationValue(763445965, entryMap)
+	value := getDestinationValue(763445965, entryMap)
 	expected := 763445965 - entryMap[0].OriginStart + entryMap[0].DestinationStart
 
 	println(expected)
