@@ -1,8 +1,7 @@
-package main
+package day_5
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"slices"
 	"strconv"
@@ -15,20 +14,10 @@ type MapEntry struct {
 	RangeLength      int
 }
 
-type SeedMap struct {
-	Start       int
-	RangeLength int
-}
-
-func main() {
-	input, _ := os.ReadFile("./input.txt")
-	day_5_part_2(string(input))
-}
-
 // For novel problems, niave solution first!
 // Understand the problem fully before trying to complete it!
 
-func day_5_part_2(input string) {
+func day_5_part_1(input string) {
 
 	testGetDestinationFromValue()
 
@@ -36,19 +25,10 @@ func day_5_part_2(input string) {
 	sections := regex.Split(input, -1)
 	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-	seedMap := parseSeeds(sections[0])
-	assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
+	seeds := parseSeeds(sections[0])
+	assert(len(seeds) == 20, fmt.Sprintf("Seeds length incorrect: %d", len(seeds)))
 
-	var seeds []int
-	for i := 0; i < len(seedMap); i++ {
-		for j := 0; j < int(seedMap[i].RangeLength); j++ {
-			seeds = append(seeds, seedMap[i].Start+j)
-		}
-	}
-
-	println(fmt.Sprintf("len: %d", len(seeds)))
-
-	// Can probably be converted to a for loop
+	// We can do this in one go
 	seedToSoilMap := parseMap(sections[1])
 	soilToFertilizerMap := parseMap(sections[2])
 	fertilizerToWaterMap := parseMap(sections[3])
@@ -57,12 +37,7 @@ func day_5_part_2(input string) {
 	temperatureToHumidity := parseMap(sections[6])
 	humidityToLocation := parseMap(sections[7])
 
-	print("done")
-
 	// We can convert this to a loop. Use previous output as input.
-	// This is SLOOWWW for part 2. Probably need to find a new way to solve this part.
-	// Yeah, shes just dying on me.
-	// I need to figure out a completely different strategy for this.
 	soils := getDestinationValues(seeds, seedToSoilMap)
 	fertilizers := getDestinationValues(soils, soilToFertilizerMap)
 	waters := getDestinationValues(fertilizers, fertilizerToWaterMap)
@@ -94,8 +69,15 @@ func getDestinationValue(originValue int, toMap []MapEntry) int {
 			continue
 		}
 
-		// Updated logic
-		return originValue - to.OriginStart + to.DestinationStart
+		// I can do this much more efficiently
+		for i := 0; i < to.RangeLength; i++ {
+
+			if to.OriginStart+i == originValue {
+				return to.DestinationStart + i
+			}
+
+		}
+
 	}
 
 	return originValue
@@ -110,19 +92,15 @@ func isWithinRange(originValue int, mapEntry MapEntry) bool {
 	return false
 }
 
-func parseSeeds(section string) []SeedMap {
+func parseSeeds(section string) []int {
 	seedStrings := regexp.MustCompile(`[0-9]+`).FindAllString(section, -1)
-	var seeds []SeedMap
+	var seedIntegers []int
 
-	for i := 0; i < len(seedStrings); i += 2 {
-		seed := SeedMap{
-			Start:       parseInt(seedStrings[i]),
-			RangeLength: parseInt(seedStrings[i+1]),
-		}
-		seeds = append(seeds, seed)
+	for _, seed := range seedStrings {
+		seedIntegers = append(seedIntegers, parseInt(seed))
 	}
 
-	return seeds
+	return seedIntegers
 }
 
 func parseMap(section string) []MapEntry {
@@ -146,7 +124,7 @@ func parseInt(str string) int {
 	value, err := strconv.Atoi(str)
 
 	if err != nil {
-		panic(fmt.Sprintf("Error parsing string to int64 %s", err.Error()))
+		panic(fmt.Sprintf("Error parsing string to int %s", err.Error()))
 	}
 
 	return value
