@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -15,11 +14,6 @@ type MapEntry struct {
 	RangeLength      int
 }
 
-type SeedMap struct {
-	Start       int
-	RangeLength int
-}
-
 func main() {
 	input, _ := os.ReadFile("./input.txt")
 	day_5_part_2(string(input))
@@ -27,6 +21,7 @@ func main() {
 
 // For novel problems, niave solution first!
 // Understand the problem fully before trying to complete it!
+// Visualizing the problem can help tremendously
 
 func day_5_part_2(input string) {
 
@@ -47,47 +42,19 @@ func day_5_part_2(input string) {
 	lightToTemperature := parseMap(sections[5])
 	temperatureToHumidity := parseMap(sections[6])
 	humidityToLocation := parseMap(sections[7])
-
-	print("done")
-
-	// We can convert this to a loop. Use previous output as input.
-	// This is SLOOWWW for part 2. Probably need to find a new way to solve this part.
-	// Yeah, shes just dying on me.
-	// I need to figure out a completely different strategy for this.
-
-	// I don't think I need to store indiviual values. I can pass ranges. Once I have the final range, I can determine the lowest value.
-	// Instead of passin indivual seeds, I can pass the ranges. So given seed range, return the appropriate map ranges
-	// Iterating through the seeds is the biggest slowdown here, and comparing to each range.
-
-	soils := getDestinationValues(seeds, seedToSoilMap)
-	fertilizers := getDestinationValues(soils, soilToFertilizerMap)
-	waters := getDestinationValues(fertilizers, fertilizerToWaterMap)
-	lights := getDestinationValues(waters, waterToLight)
-	temperatures := getDestinationValues(lights, lightToTemperature)
-	humidities := getDestinationValues(temperatures, temperatureToHumidity)
-	locations := getDestinationValues(humidities, humidityToLocation)
-
-	println(slices.Min(locations))
 }
 
-func getDestinationRange() {
+func getDestinationValues(fromMap []MapEntry, toMap []MapEntry) []MapEntry {
 
-}
+	// Think of it this wat
 
-func getDestinationRanges() {
+	// Origin: |     -----|
+	// Map:
+	// Origin: 		|-----     |
+	// Destination 			|-----     |
 
-}
-
-func getDestinationValues(originValues []int, toMap []MapEntry) []int {
-
-	var destinationValues []int
-
-	for _, originValue := range originValues {
-		destinationValue := getDestinationValue(originValue, toMap)
-		destinationValues = append(destinationValues, destinationValue)
-	}
-
-	return destinationValues
+	// There is a clear pattern we can take advantage of.
+	// Either origin 1 or origin 2 will be a value that we can use.
 }
 
 func getDestinationValue(originValue int, toMap []MapEntry) int {
@@ -114,13 +81,13 @@ func isWithinRange(originValue int, mapEntry MapEntry) bool {
 	return false
 }
 
-func parseSeeds(section string) []SeedMap {
+func parseSeeds(section string) []MapEntry {
 	seedStrings := regexp.MustCompile(`[0-9]+`).FindAllString(section, -1)
-	var seeds []SeedMap
+	var seeds []MapEntry
 
 	for i := 0; i < len(seedStrings); i += 2 {
-		seed := SeedMap{
-			Start:       parseInt(seedStrings[i]),
+		seed := MapEntry{
+			OriginStart: parseInt(seedStrings[i]),
 			RangeLength: parseInt(seedStrings[i+1]),
 		}
 		seeds = append(seeds, seed)
