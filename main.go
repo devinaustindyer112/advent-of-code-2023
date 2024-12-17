@@ -26,59 +26,91 @@ func main() {
 func day_5_part_2(input string) {
 
 	testGetDestinationFromValue()
+	/*
+	   regex := regexp.MustCompile(`\n\n`)
+	   sections := regex.Split(input, -1)
+	   assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-	regex := regexp.MustCompile(`\n\n`)
-	sections := regex.Split(input, -1)
-	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
+	   seedMap := parseSeeds(sections[0])
+	   assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
 
-	seedMap := parseSeeds(sections[0])
-	assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
-
-	// Can probably be converted to a for loop
-	seedToSoilMap := parseMap(sections[1])
-	soilToFertilizerMap := parseMap(sections[2])
-	fertilizerToWaterMap := parseMap(sections[3])
-	waterToLight := parseMap(sections[4])
-	lightToTemperature := parseMap(sections[5])
-	temperatureToHumidity := parseMap(sections[6])
-	humidityToLocation := parseMap(sections[7])
+	   // Can probably be converted to a for loop
+	   seedToSoilMap := parseMap(sections[1])
+	   soilToFertilizerMap := parseMap(sections[2])
+	   fertilizerToWaterMap := parseMap(sections[3])
+	   waterToLight := parseMap(sections[4])
+	   lightToTemperature := parseMap(sections[5])
+	   temperatureToHumidity := parseMap(sections[6])
+	   humidityToLocation := parseMap(sections[7])
+	*/
 }
 
-func getDestinationValues(fromMap []MapEntry, toMap []MapEntry) []MapEntry {
+// This logic is the right start, but it's incorrect.
 
-	// Think of it this wat
+// Matching scenarios
 
-	// Origin: |     -----|
-	// Map:
-	// Origin: 		|-----     |
-	// Destination 			|-----     |
+// |   --    |
+//    |--|
 
-	// There is a clear pattern we can take advantage of.
-	// Either origin 1 or origin 2 will be a value that we can use.
-}
+//    |--|
+// |   --    |
 
-func getDestinationValue(originValue int, toMap []MapEntry) int {
+//    |--    |
+// |   --|
 
-	for _, to := range toMap {
+// |     --|
+//      |--     |
 
-		if !isWithinRange(originValue, to) {
-			continue
-		}
+// |          |
+//              |          |
 
-		// Updated logic
-		return originValue - to.OriginStart + to.DestinationStart
+// Matchin origin values are always the minimum origin and the maximum origin within the bounds
+// Destination can be calculated once we have the origin values. I belive we can use the to origins with the range length to determine destination values. Probably can check some condition to determine if it is valid
+
+func getDestinationValue(fromMap MapEntry, toMap MapEntry) MapEntry {
+
+	originStart := max(fromMap.OriginStart, toMap.OriginStart)
+	originEnd := min(fromMap.OriginStart+fromMap.RangeLength, toMap.OriginStart+fromMap.RangeLength)
+
+	if originStart > originEnd {
+		return MapEntry{}
 	}
 
-	return originValue
+	// Now i need to determine range length and destination start. Should be more arithmetic
+	return MapEntry{}
 }
 
-func isWithinRange(originValue int, mapEntry MapEntry) bool {
-
-	if mapEntry.OriginStart <= originValue && originValue < mapEntry.OriginStart+mapEntry.RangeLength {
-		return true
+func testGetDestinationFromValue() {
+	from1 := MapEntry{
+		OriginStart: 0,
+		RangeLength: 10,
 	}
 
-	return false
+	to1 := MapEntry{
+		OriginStart:      0,
+		DestinationStart: 20,
+		RangeLength:      10,
+	}
+
+	actual1 := getDestinationValue(from1, to1)
+	assert(actual1.OriginStart == 20, fmt.Sprintf("Incorrect origin start %d", actual1.OriginStart))
+	assert(actual1.RangeLength == 10, fmt.Sprintf("Incorrect origin start %d", actual1.OriginStart))
+
+	// This is breaking
+	from2 := MapEntry{
+		OriginStart: 0,
+		RangeLength: 10,
+	}
+
+	to2 := MapEntry{
+		OriginStart:      9,
+		DestinationStart: 30,
+		RangeLength:      10,
+	}
+
+	actual2 := getDestinationValue(from2, to2)
+	assert(actual2.OriginStart == 39, fmt.Sprintf("Incorrect origin start %d", actual2.OriginStart))
+	assert(actual2.RangeLength == 2, fmt.Sprintf("Incorrect origin start %d", actual2.OriginStart))
 }
 
 func parseSeeds(section string) []MapEntry {
@@ -129,21 +161,4 @@ func assert(condition bool, errMessage string) {
 		panic(errMessage)
 	}
 
-}
-
-// Write some tests. First go round was no bueno
-func testGetDestinationFromValue() {
-	entryMap := []MapEntry{
-		{
-			DestinationStart: 679195301,
-			OriginStart:      529385087,
-			RangeLength:      505408118,
-		},
-	}
-
-	value := getDestinationValue(763445965, entryMap)
-	expected := 763445965 - entryMap[0].OriginStart + entryMap[0].DestinationStart
-
-	println(expected)
-	assert(value == expected, fmt.Sprintf("Expected: %d but got: %d", expected, value))
 }
