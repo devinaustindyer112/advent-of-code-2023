@@ -72,12 +72,21 @@ func getDestinationValue(fromMap MapEntry, toMap MapEntry) MapEntry {
 	originStart := max(fromMap.OriginStart, toMap.OriginStart)
 	originEnd := min(fromMap.OriginStart+fromMap.RangeLength, toMap.OriginStart+fromMap.RangeLength)
 
+	// This needs to be updated. There is a default value.
 	if originStart > originEnd {
 		return MapEntry{}
 	}
 
+	rangeLength := originEnd - originStart
+	destination := toMap.DestinationStart + toMap.OriginStart - originStart
+
 	// Now i need to determine range length and destination start. Should be more arithmetic
-	return MapEntry{}
+	// This will be the destination values of this map, but will be origin for the next.
+	return MapEntry{
+		OriginStart:      destination,
+		DestinationStart: 0,
+		RangeLength:      rangeLength,
+	}
 }
 
 func testGetDestinationFromValue() {
