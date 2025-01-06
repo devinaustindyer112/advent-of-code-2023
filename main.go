@@ -23,6 +23,7 @@ func main() {
 // Understand the problem fully before trying to complete it!
 // Visualizing the problem can help tremendously
 
+
 func day_5_part_2(input string) {
 
 	testGetDestinationFromValue()
