@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -23,10 +21,8 @@ func main() {
 // Understand the problem fully before trying to complete it!
 // Visualizing the problem can help tremendously
 
-
 func day_5_part_2(input string) {
 
-	testGetDestinationFromValue()
 	/*
 	   regex := regexp.MustCompile(`\n\n`)
 	   sections := regex.Split(input, -1)
@@ -75,7 +71,10 @@ func getDestinationValue(fromMap MapEntry, toMap MapEntry) MapEntry {
 
 	// This needs to be updated. There is a default value.
 	if originStart >= originEnd {
-		return MapEntry{}
+		return MapEntry{
+			OriginStart: fromMap.OriginStart,
+			RangeLength: 1,
+		}
 	}
 
 	rangeLength := originEnd - originStart
@@ -84,44 +83,9 @@ func getDestinationValue(fromMap MapEntry, toMap MapEntry) MapEntry {
 	// Now i need to determine range length and destination start. Should be more arithmetic
 	// This will be the destination values of this map, but will be origin for the next.
 	return MapEntry{
-		OriginStart:      destination,
-		DestinationStart: 0,
-		RangeLength:      rangeLength,
+		OriginStart: destination,
+		RangeLength: rangeLength,
 	}
-}
-
-func testGetDestinationFromValue() {
-	from1 := MapEntry{
-		OriginStart: 0,
-		RangeLength: 10,
-	}
-
-	to1 := MapEntry{
-		OriginStart:      0,
-		DestinationStart: 20,
-		RangeLength:      10,
-	}
-
-	actual1 := getDestinationValue(from1, to1)
-	assert(actual1.OriginStart == 20, fmt.Sprintf("Incorrect origin start %d", actual1.OriginStart))
-	assert(actual1.RangeLength == 10, fmt.Sprintf("Incorrect range length %d", actual1.RangeLength))
-
-	// This is breaking
-	from2 := MapEntry{
-		OriginStart: 0,
-		RangeLength: 10,
-	}
-
-	to2 := MapEntry{
-		OriginStart:      9,
-		DestinationStart: 30,
-		RangeLength:      10,
-	}
-
-	// Need to double check that these tests are accurate.
-	actual2 := getDestinationValue(from2, to2)
-	assert(actual2.OriginStart == 30, fmt.Sprintf("Incorrect origin start %d", actual2.OriginStart))
-	assert(actual2.RangeLength == 1, fmt.Sprintf("Incorrect range length %d", actual2.RangeLength))
 }
 
 func parseSeeds(section string) []MapEntry {
@@ -154,22 +118,4 @@ func parseMap(section string) []MapEntry {
 	}
 
 	return entriesMap
-}
-
-func parseInt(str string) int {
-	value, err := strconv.Atoi(str)
-
-	if err != nil {
-		panic(fmt.Sprintf("Error parsing string to int64 %s", err.Error()))
-	}
-
-	return value
-}
-
-func assert(condition bool, errMessage string) {
-
-	if !condition {
-		panic(errMessage)
-	}
-
 }
