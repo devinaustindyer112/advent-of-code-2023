@@ -37,19 +37,12 @@ func day_5_part_2(input string) {
 	humidityToLocation := parseMap(sections[7])
 
 	destinations := getDestinationMaps(seedMap, seedToSoilMap)
-	println(len(destinations))
 	destinations = getDestinationMaps(destinations, soilToFertilizerMap)
-	println(len(destinations))
 	destinations = getDestinationMaps(destinations, fertilizerToWaterMap)
-	println(len(destinations))
 	destinations = getDestinationMaps(destinations, waterToLight)
-	println(len(destinations))
 	destinations = getDestinationMaps(destinations, lightToTemperature)
-	println(len(destinations))
 	destinations = getDestinationMaps(destinations, temperatureToHumidity)
-	println(len(destinations))
 	destinations = getDestinationMaps(destinations, humidityToLocation)
-	println(len(destinations))
 
 	for i := 0; i < len(destinations); i++ {
 		fmt.Printf(`Origin start: %d`, destinations[i].OriginStart)
@@ -72,8 +65,20 @@ func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) []MapEntry {
 	return destinationMaps
 }
 
-// I think we can come up with some better naming here
-func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) MapEntry {
+// I think I can do this recursively. Will need to update this. This will return an array now.
+func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
+
+	var destinationMap []MapEntry
+
+	// If no toMaps are provided, map to itself.
+	if len(toMaps) == 0 {
+		return []MapEntry{
+			{
+				OriginStart: fromMap.OriginStart,
+				RangeLength: fromMap.RangeLength,
+			},
+		}
+	}
 
 	for i := 0; i < len(toMaps); i++ {
 		originStart := max(fromMap.OriginStart, toMaps[i].OriginStart)
@@ -83,18 +88,36 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) MapEntry {
 			rangeLength := originEnd - originStart
 			destination := toMaps[i].DestinationStart + originStart - toMaps[i].OriginStart
 
-			return MapEntry{
+			destinationMap = append(destinationMap, MapEntry{
 				OriginStart: destination,
 				RangeLength: rangeLength,
+			})
+
+			if fromMap.OriginStart < originStart && fromMap.OriginStart+fromMap.RangeLength > originEnd {
+				// If the intersection in the middle
+				// 	append(getDestinationMap(left-side))
+				// 	append(getDestinationMap(right-side))
+			}
+
+			if fromMap.OriginStart < originStart && fromMap.OriginStart+fromMap.RangeLength <= originEnd {
+				// If the intersection is on the right side
+				//	append(getDestinationMap(left-side))
+			}
+
+			if fromMap.OriginStart < originStart && fromMap.OriginStart+fromMap.RangeLength > originEnd {
+				// If the intersection is on the left side
+				// 	append(getDestinationMap(right-side))
 			}
 		}
 	}
 
-	// Return default here
-	return MapEntry{
-		OriginStart: fromMap.OriginStart,
-		RangeLength: fromMap.RangeLength,
-	}
+	// if there are no matches then we should retur
+	return []MapEntry{
+		{
+			OriginStart: fromMap.OriginStart,
+			RangeLength: fromMap.RangeLength,
+		},
+	} // This still needs some work. How do I know when there is no mapping?
 }
 
 func parseSeeds(section string) []MapEntry {

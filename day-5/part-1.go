@@ -75,9 +75,7 @@ func getDestinationValue(originValue int, toMap []MapEntry) int {
 			if to.OriginStart+i == originValue {
 				return to.DestinationStart + i
 			}
-
 		}
-
 	}
 
 	return originValue
