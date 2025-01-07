@@ -6,7 +6,7 @@ import (
 
 func TestGetDestinationValue(t *testing.T) {
 
-	actual1 := getDestinationValue(
+	actual1 := getDestinationMap(
 		MapEntry{
 			OriginStart: 0,
 			RangeLength: 10,
@@ -29,7 +29,7 @@ func TestGetDestinationValue(t *testing.T) {
 func TestGetDestinationValueSingleMatch(t *testing.T) {
 
 	// Need to double check that these tests are accurate.
-	actual := getDestinationValue(
+	actual := getDestinationMap(
 		MapEntry{
 			OriginStart: 0,
 			RangeLength: 10,
@@ -52,7 +52,7 @@ func TestGetDestinationValueSingleMatch(t *testing.T) {
 func TestGetDestinationValueNoMatch(t *testing.T) {
 
 	// Need to double check that these tests are accurate.
-	actual := getDestinationValue(
+	actual := getDestinationMap(
 		MapEntry{
 			OriginStart: 0,
 			RangeLength: 10,
@@ -71,7 +71,3 @@ func TestGetDestinationValueNoMatch(t *testing.T) {
 		t.Error("Naaaah")
 	}
 }
-
-// Need to test edge cases.
-// Origin and destination intersact only at a single value.
-// There is nor corresponding destination

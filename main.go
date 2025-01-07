@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -17,74 +18,82 @@ func main() {
 	day_5_part_2(string(input))
 }
 
-// For novel problems, niave solution first!
-// Understand the problem fully before trying to complete it!
-// Visualizing the problem can help tremendously
-
 func day_5_part_2(input string) {
 
-	/*
-	   regex := regexp.MustCompile(`\n\n`)
-	   sections := regex.Split(input, -1)
-	   assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
+	regex := regexp.MustCompile(`\n\n`)
+	sections := regex.Split(input, -1)
+	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-	   seedMap := parseSeeds(sections[0])
-	   assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
+	seedMap := parseSeeds(sections[0])
+	assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
 
-	   // Can probably be converted to a for loop
-	   seedToSoilMap := parseMap(sections[1])
-	   soilToFertilizerMap := parseMap(sections[2])
-	   fertilizerToWaterMap := parseMap(sections[3])
-	   waterToLight := parseMap(sections[4])
-	   lightToTemperature := parseMap(sections[5])
-	   temperatureToHumidity := parseMap(sections[6])
-	   humidityToLocation := parseMap(sections[7])
-	*/
+	// This can be converted into a loop
+	seedToSoilMap := parseMap(sections[1])
+	soilToFertilizerMap := parseMap(sections[2])
+	fertilizerToWaterMap := parseMap(sections[3])
+	waterToLight := parseMap(sections[4])
+	lightToTemperature := parseMap(sections[5])
+	temperatureToHumidity := parseMap(sections[6])
+	humidityToLocation := parseMap(sections[7])
+
+	destinations := getDestinationMaps(seedMap, seedToSoilMap)
+	println(len(destinations))
+	destinations = getDestinationMaps(destinations, soilToFertilizerMap)
+	println(len(destinations))
+	destinations = getDestinationMaps(destinations, fertilizerToWaterMap)
+	println(len(destinations))
+	destinations = getDestinationMaps(destinations, waterToLight)
+	println(len(destinations))
+	destinations = getDestinationMaps(destinations, lightToTemperature)
+	println(len(destinations))
+	destinations = getDestinationMaps(destinations, temperatureToHumidity)
+	println(len(destinations))
+	destinations = getDestinationMaps(destinations, humidityToLocation)
+	println(len(destinations))
+
+	for i := 0; i < len(destinations); i++ {
+		fmt.Printf(`Origin start: %d`, destinations[i].OriginStart)
+		fmt.Printf(`Destination start: %d`, destinations[i].DestinationStart)
+		fmt.Printf(`Range length: %d`, destinations[i].DestinationStart)
+		fmt.Println()
+	}
 }
 
-// This logic is the right start, but it's incorrect.
+func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) []MapEntry {
+	// I dont think this works anymore and probably and issue with get Destination maps. Its addding a new map each time one doesn exist. I think we've handled optimizing it enought. Now we just need to make sure it works appropriately.
 
-// Matching scenarios
+	// This is definitely where we're spending most of our time.
+	var destinationMaps []MapEntry
+	for i := 0; i < len(fromMaps); i++ {
+		destinationMap := getDestinationMap(fromMaps[i], toMaps)
+		destinationMaps = append(destinationMaps, destinationMap)
+	}
 
-// |   --    |
-//    |--|
+	return destinationMaps
+}
 
-//    |--|
-// |   --    |
+// I think we can come up with some better naming here
+func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) MapEntry {
 
-//    |--    |
-// |   --|
+	for i := 0; i < len(toMaps); i++ {
+		originStart := max(fromMap.OriginStart, toMaps[i].OriginStart)
+		originEnd := min(fromMap.OriginStart+fromMap.RangeLength, toMaps[i].OriginStart+fromMap.RangeLength)
 
-// |     --|
-//      |--     |
+		if originStart < originEnd {
+			rangeLength := originEnd - originStart
+			destination := toMaps[i].DestinationStart + originStart - toMaps[i].OriginStart
 
-// |          |
-//              |          |
-
-// Matchin origin values are always the minimum origin and the maximum origin within the bounds
-// Destination can be calculated once we have the origin values. I belive we can use the to origins with the range length to determine destination values. Probably can check some condition to determine if it is valid
-
-func getDestinationValue(fromMap MapEntry, toMap MapEntry) MapEntry {
-
-	originStart := max(fromMap.OriginStart, toMap.OriginStart)
-	originEnd := min(fromMap.OriginStart+fromMap.RangeLength, toMap.OriginStart+fromMap.RangeLength)
-
-	// This needs to be updated. There is a default value.
-	if originStart >= originEnd {
-		return MapEntry{
-			OriginStart: fromMap.OriginStart,
-			RangeLength: 1,
+			return MapEntry{
+				OriginStart: destination,
+				RangeLength: rangeLength,
+			}
 		}
 	}
 
-	rangeLength := originEnd - originStart
-	destination := toMap.DestinationStart + originStart - toMap.OriginStart
-
-	// Now i need to determine range length and destination start. Should be more arithmetic
-	// This will be the destination values of this map, but will be origin for the next.
+	// Return default here
 	return MapEntry{
-		OriginStart: destination,
-		RangeLength: rangeLength,
+		OriginStart: fromMap.OriginStart,
+		RangeLength: fromMap.RangeLength,
 	}
 }
 
@@ -111,8 +120,8 @@ func parseMap(section string) []MapEntry {
 	for _, entry := range entriesList {
 		entryValues := regexp.MustCompile(`[0-9]+`).FindAllString(entry, -1)
 		entriesMap = append(entriesMap, MapEntry{
-			DestinationStart: parseInt(entryValues[0]),
 			OriginStart:      parseInt(entryValues[1]),
+			DestinationStart: parseInt(entryValues[0]),
 			RangeLength:      parseInt(entryValues[2]),
 		})
 	}
