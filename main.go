@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -13,6 +12,14 @@ type MapEntry struct {
 	RangeLength      int
 }
 
+func (m MapEntry) originEnd() int {
+	return m.OriginStart + m.RangeLength
+}
+
+func (m MapEntry) destinationEnd() int {
+	return m.DestinationStart + m.RangeLength
+}
+
 func main() {
 	input, _ := os.ReadFile("./input.txt")
 	day_5_part_2(string(input))
@@ -20,49 +27,28 @@ func main() {
 
 func day_5_part_2(input string) {
 
-	regex := regexp.MustCompile(`\n\n`)
-	sections := regex.Split(input, -1)
-	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
+	/*
+		regex := regexp.MustCompile(`\n\n`)
+		sections := regex.Split(input, -1)
+		assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-	seedMap := parseSeeds(sections[0])
-	assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
+		seedMap := parseSeeds(sections[0])
+		assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
 
-	// This can be converted into a loop
-	seedToSoilMap := parseMap(sections[1])
-	soilToFertilizerMap := parseMap(sections[2])
-	fertilizerToWaterMap := parseMap(sections[3])
-	waterToLight := parseMap(sections[4])
-	lightToTemperature := parseMap(sections[5])
-	temperatureToHumidity := parseMap(sections[6])
-	humidityToLocation := parseMap(sections[7])
+		// This can be converted into a loop
+		seedToSoilMap := parseMap(sections[1])
+		soilToFertilizerMap := parseMap(sections[2])
+		fertilizerToWaterMap := parseMap(sections[3])
+		waterToLight := parseMap(sections[4])
+		lightToTemperature := parseMap(sections[5])
+		temperatureToHumidity := parseMap(sections[6])
+		humidityToLocation := parseMap(sections[7])
+	*/
 
-	destinations := getDestinationMaps(seedMap, seedToSoilMap)
-	destinations = getDestinationMaps(destinations, soilToFertilizerMap)
-	destinations = getDestinationMaps(destinations, fertilizerToWaterMap)
-	destinations = getDestinationMaps(destinations, waterToLight)
-	destinations = getDestinationMaps(destinations, lightToTemperature)
-	destinations = getDestinationMaps(destinations, temperatureToHumidity)
-	destinations = getDestinationMaps(destinations, humidityToLocation)
-
-	for i := 0; i < len(destinations); i++ {
-		fmt.Printf(`Origin start: %d`, destinations[i].OriginStart)
-		fmt.Printf(`Destination start: %d`, destinations[i].DestinationStart)
-		fmt.Printf(`Range length: %d`, destinations[i].DestinationStart)
-		fmt.Println()
-	}
 }
 
-func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) []MapEntry {
-	// I dont think this works anymore and probably and issue with get Destination maps. Its addding a new map each time one doesn exist. I think we've handled optimizing it enought. Now we just need to make sure it works appropriately.
+func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) {
 
-	// This is definitely where we're spending most of our time.
-	var destinationMaps []MapEntry
-	for i := 0; i < len(fromMaps); i++ {
-		destinationMap := getDestinationMap(fromMaps[i], toMaps)
-		destinationMaps = append(destinationMaps, destinationMap)
-	}
-
-	return destinationMaps
 }
 
 // I think I can do this recursively. Will need to update this. This will return an array now.
@@ -82,7 +68,7 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 
 	for i := 0; i < len(toMaps); i++ {
 		originStart := max(fromMap.OriginStart, toMaps[i].OriginStart)
-		originEnd := min(fromMap.OriginStart+fromMap.RangeLength, toMaps[i].OriginStart+fromMap.RangeLength)
+		originEnd := min(fromMap.OriginStart+fromMap.RangeLength, toMaps[i].OriginStart+toMaps[i].RangeLength)
 
 		if originStart < originEnd {
 			rangeLength := originEnd - originStart
@@ -93,31 +79,44 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 				RangeLength: rangeLength,
 			})
 
-			if fromMap.OriginStart < originStart && fromMap.OriginStart+fromMap.RangeLength > originEnd {
-				// If the intersection in the middle
-				// 	append(getDestinationMap(left-side))
-				// 	append(getDestinationMap(right-side))
+			right := MapEntry{
+				OriginStart: originEnd + 1,
+				RangeLength: fromMap.destinationEnd() - originEnd,
 			}
 
-			if fromMap.OriginStart < originStart && fromMap.OriginStart+fromMap.RangeLength <= originEnd {
-				// If the intersection is on the right side
-				//	append(getDestinationMap(left-side))
+			left := MapEntry{
+				OriginStart: originStart,
+				RangeLength: originStart - fromMap.OriginStart,
 			}
 
-			if fromMap.OriginStart < originStart && fromMap.OriginStart+fromMap.RangeLength > originEnd {
-				// If the intersection is on the left side
-				// 	append(getDestinationMap(right-side))
+			newMap := toMaps[1:]
+
+			// 1. All matches are on the left side
+			if originStart == fromMap.OriginStart && originEnd < fromMap.destinationEnd() {
+				destinationMap = append(destinationMap, getDestinationMap(right, newMap)...)
+				return destinationMap
 			}
+
+			// 2. All matches are on the right side
+			if originStart > fromMap.OriginStart && originEnd == fromMap.originEnd() {
+				destinationMap = append(destinationMap, getDestinationMap(left, newMap)...)
+				return destinationMap
+			}
+
+			// 3. Matches are in the middle
+			// TODO: Need to update this to have if statement. This is capturing times when there
+			// is not more searching to be done.
+			if originStart == fromMap.OriginStart && originEnd == fromMap.originEnd() {
+				destinationMap = append(destinationMap, getDestinationMap(right, newMap)...)
+				destinationMap = append(destinationMap, getDestinationMap(left, newMap)...)
+				return destinationMap
+			}
+
+			return destinationMap
 		}
 	}
 
-	// if there are no matches then we should retur
-	return []MapEntry{
-		{
-			OriginStart: fromMap.OriginStart,
-			RangeLength: fromMap.RangeLength,
-		},
-	} // This still needs some work. How do I know when there is no mapping?
+	return destinationMap
 }
 
 func parseSeeds(section string) []MapEntry {
