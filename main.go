@@ -51,7 +51,6 @@ func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) {
 
 }
 
-// I think I can do this recursively. Will need to update this. This will return an array now.
 func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 
 	var destinationMap []MapEntry
@@ -92,7 +91,7 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 			newMap := toMaps[1:]
 
 			// 1. All matches are on the left side
-			if originStart == fromMap.OriginStart && originEnd < fromMap.destinationEnd() {
+			if fromMap.OriginStart == originStart && fromMap.destinationEnd() > originEnd {
 				destinationMap = append(destinationMap, getDestinationMap(right, newMap)...)
 				return destinationMap
 			}
@@ -104,9 +103,7 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 			}
 
 			// 3. Matches are in the middle
-			// TODO: Need to update this to have if statement. This is capturing times when there
-			// is not more searching to be done.
-			if originStart == fromMap.OriginStart && originEnd == fromMap.originEnd() {
+			if originStart > fromMap.OriginStart && originEnd < fromMap.originEnd() {
 				destinationMap = append(destinationMap, getDestinationMap(right, newMap)...)
 				destinationMap = append(destinationMap, getDestinationMap(left, newMap)...)
 				return destinationMap

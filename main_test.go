@@ -4,32 +4,25 @@ import (
 	"testing"
 )
 
-// There is a perfect overlap
-
-// The destination origin matches with left side of origin origin
-// The desination origin mathces with right side of the origin origin
-// No match. Destination origins are left side
-// No match. Destination origins are right side
-
 func TestGetDestinationMatchLeft(t *testing.T) {
 
 	fromInput := MapEntry{
-		OriginStart: 0,
-		RangeLength: 10,
+		OriginStart: 10,
+		RangeLength: 5,
 	}
 
 	toInput := []MapEntry{
 		{
-			OriginStart:      0,
+			OriginStart:      5,
 			DestinationStart: 10,
-			RangeLength:      5,
+			RangeLength:      10,
 		},
 	}
 
 	actual := getDestinationMap(fromInput, toInput)
 
-	if actual[0].OriginStart != 10 {
-		t.Fatalf("incorrect origin: %d", actual[0].OriginStart)
+	if actual[0].OriginStart != 15 {
+		t.Fatalf("incorrect origin %d", actual[0].OriginStart)
 	}
 
 	if actual[0].RangeLength != 5 {
@@ -40,8 +33,8 @@ func TestGetDestinationMatchLeft(t *testing.T) {
 func TestGetDestinationMapMatchRight(t *testing.T) {
 
 	fromInput := MapEntry{
-		OriginStart: 5,
-		RangeLength: 5,
+		OriginStart: 10,
+		RangeLength: 10,
 	}
 
 	toInput := []MapEntry{
@@ -54,11 +47,11 @@ func TestGetDestinationMapMatchRight(t *testing.T) {
 
 	actual := getDestinationMap(fromInput, toInput)
 
-	if actual[0].OriginStart != 12 {
-		t.Fatalf("incorrect origin: %d", actual[0].OriginStart)
+	if actual[0].OriginStart != 14 {
+		t.Fatalf("incorrect origin %d", actual[0].OriginStart)
 	}
 
-	if actual[0].RangeLength != 2 {
+	if actual[0].RangeLength != 8 {
 		t.Fatalf("incorrect range length %d", actual[0].RangeLength)
 	}
 }
@@ -72,35 +65,130 @@ func TestGetDestinationMapMatchPerfect(t *testing.T) {
 
 	toInput := []MapEntry{
 		{
-			OriginStart:      8,
-			DestinationStart: 12,
-			RangeLength:      10,
+			OriginStart:      5,
+			DestinationStart: 20,
+			RangeLength:      5,
 		},
 	}
 
 	actual := getDestinationMap(fromInput, toInput)
 
-	if actual[0].OriginStart != 12 {
-		t.Fatalf("incorrect origin: %d", actual[0].OriginStart)
+	if actual[0].OriginStart != 20 {
+		t.Fatalf("incorrect origin %d", actual[0].OriginStart)
 	}
 
-	if actual[0].RangeLength != 2 {
+	if actual[0].RangeLength != 5 {
 		t.Fatalf("incorrect range length %d", actual[0].RangeLength)
 	}
 }
 
 func TestGetDestinationMapMatchMiddle(t *testing.T) {
 
+	fromInput := MapEntry{
+		OriginStart: 0,
+		RangeLength: 20,
+	}
+
+	toInput := []MapEntry{
+		{
+			OriginStart:      5,
+			DestinationStart: 20,
+			RangeLength:      10,
+		},
+	}
+
+	actual := getDestinationMap(fromInput, toInput)
+
+	if actual[0].OriginStart != 20 {
+		t.Fatalf("incorrect origin %d", actual[0].OriginStart)
+	}
+
+	if actual[0].RangeLength != 10 {
+		t.Fatalf("incorrect range length %d", actual[0].RangeLength)
+	}
+
 }
 
 func TestGetDestinationMapMatchMultiple(t *testing.T) {
 
+	fromInput := MapEntry{
+		OriginStart: 0,
+		RangeLength: 100,
+	}
+
+	toInput := []MapEntry{
+		{
+			OriginStart:      5,
+			DestinationStart: 20,
+			RangeLength:      10,
+		},
+		{
+			OriginStart:      40,
+			DestinationStart: 55,
+			RangeLength:      10,
+		},
+		{
+			OriginStart:      200,
+			DestinationStart: 215,
+			RangeLength:      10,
+		},
+	}
+
+	actual := getDestinationMap(fromInput, toInput)
+
+	if len(actual) != 2 {
+		t.Fatalf("incorrect length %d", len(actual))
+	}
+
+	if actual[0].OriginStart != 20 {
+		t.Fatalf("incorrect origin %d", actual[0].OriginStart)
+	}
+
+	if actual[1].OriginStart != 55 {
+		t.Fatalf("incorrect origin %d", actual[1].OriginStart)
+	}
 }
 
 func TestGetDestinationMapNoMatchLeft(t *testing.T) {
 
+	fromInput := MapEntry{
+		OriginStart: 10,
+		RangeLength: 10,
+	}
+
+	toInput := []MapEntry{
+		{
+			OriginStart:      0,
+			DestinationStart: 12,
+			RangeLength:      2,
+		},
+	}
+
+	actual := getDestinationMap(fromInput, toInput)
+
+	if len(actual) != 0 {
+		t.Fatalf("incorrect length %d", len(actual))
+	}
 }
 
 func TestGetDestinationMapNoMatchRight(t *testing.T) {
 
+	fromInput := MapEntry{
+		OriginStart: 10,
+		RangeLength: 10,
+	}
+
+	toInput := []MapEntry{
+		{
+			OriginStart:      100,
+			DestinationStart: 12,
+			RangeLength:      2,
+		},
+	}
+
+	actual := getDestinationMap(fromInput, toInput)
+
+	if len(actual) != 0 {
+		t.Fatalf("incorrect length %d", len(actual))
+	}
 }
