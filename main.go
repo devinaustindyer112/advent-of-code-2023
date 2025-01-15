@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -27,28 +28,38 @@ func main() {
 
 func day_5_part_2(input string) {
 
-	/*
-		regex := regexp.MustCompile(`\n\n`)
-		sections := regex.Split(input, -1)
-		assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
+	regex := regexp.MustCompile(`\n\n`)
+	sections := regex.Split(input, -1)
+	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
-		seedMap := parseSeeds(sections[0])
-		assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
+	seedMap := parseSeeds(sections[0])
+	assert(len(seedMap) == 20, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
 
-		// This can be converted into a loop
-		seedToSoilMap := parseMap(sections[1])
-		soilToFertilizerMap := parseMap(sections[2])
-		fertilizerToWaterMap := parseMap(sections[3])
-		waterToLight := parseMap(sections[4])
-		lightToTemperature := parseMap(sections[5])
-		temperatureToHumidity := parseMap(sections[6])
-		humidityToLocation := parseMap(sections[7])
-	*/
+	// This can be converted into a loop
+	seedToSoilMap := parseMap(sections[1])
+
+	soil := getDestinationMaps(seedMap, seedToSoilMap)
+
+	print(len(soil))
+
+	// soiltofertilizermap := parsemap(sections[2])
+	// fertilizertowatermap := parsemap(sections[3])
+	// watertolight := parsemap(sections[4])
+	// lighttotemperature := parsemap(sections[5])
+	// temperaturetohumidity := parsemap(sections[6])
+	// humiditytolocation := parsemap(sections[7])
 
 }
 
-func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) {
+func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) []MapEntry {
 
+	var destinationMap []MapEntry
+
+	for i := 0; i < len(fromMaps); i++ {
+		destinationMap = append(destinationMap, getDestinationMap(fromMaps[i], toMaps)...)
+	}
+
+	return destinationMap
 }
 
 func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
