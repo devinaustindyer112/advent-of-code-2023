@@ -40,15 +40,27 @@ func day_5_part_2(input string) {
 
 	soil := getDestinationMaps(seedMap, seedToSoilMap)
 
-	print(len(soil))
+	println(len(soil))
 
-	// soiltofertilizermap := parsemap(sections[2])
-	// fertilizertowatermap := parsemap(sections[3])
-	// watertolight := parsemap(sections[4])
-	// lighttotemperature := parsemap(sections[5])
-	// temperaturetohumidity := parsemap(sections[6])
-	// humiditytolocation := parsemap(sections[7])
+	soilToFertilizerMap := parseMap(sections[2])
+	fertilizerToWater := parseMap(sections[3])
+	waterToLight := parseMap(sections[4])
+	lightToTemperature := parseMap(sections[5])
+	temperatureToHumidity := parseMap(sections[6])
+	humidityToLocation := parseMap(sections[7])
 
+	fertilizer := getDestinationMaps(soil, soilToFertilizerMap)
+	println(len(fertilizer))
+	water := getDestinationMaps(fertilizer, fertilizerToWater)
+	println(len(water))
+	light := getDestinationMaps(water, waterToLight)
+	println(len(light))
+	temp := getDestinationMaps(light, lightToTemperature)
+	println(len(temp))
+	humidity := getDestinationMaps(temp, temperatureToHumidity)
+	println(len(humidity))
+	location := getDestinationMaps(humidity, humidityToLocation)
+	println(len(location))
 }
 
 func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) []MapEntry {
@@ -75,6 +87,8 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 			},
 		}
 	}
+
+	// TODO: How can I handle cases where there is no match and I need to return the toMap itself?
 
 	for i := 0; i < len(toMaps); i++ {
 		originStart := max(fromMap.OriginStart, toMaps[i].OriginStart)
@@ -124,7 +138,12 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 		}
 	}
 
-	return destinationMap
+	return []MapEntry{
+		{
+			OriginStart: fromMap.OriginStart,
+			RangeLength: fromMap.RangeLength,
+		},
+	}
 }
 
 func parseSeeds(section string) []MapEntry {

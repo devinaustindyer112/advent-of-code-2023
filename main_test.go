@@ -136,7 +136,7 @@ func TestGetDestinationMapMatchMultiple(t *testing.T) {
 
 	actual := getDestinationMap(fromInput, toInput)
 
-	if len(actual) != 2 {
+	if len(actual) != 5 {
 		t.Fatalf("incorrect length %d", len(actual))
 	}
 
@@ -166,7 +166,7 @@ func TestGetDestinationMapNoMatchLeft(t *testing.T) {
 
 	actual := getDestinationMap(fromInput, toInput)
 
-	if len(actual) != 0 {
+	if actual[0].OriginStart != 10 {
 		t.Fatalf("incorrect length %d", len(actual))
 	}
 }
@@ -188,7 +188,7 @@ func TestGetDestinationMapNoMatchRight(t *testing.T) {
 
 	actual := getDestinationMap(fromInput, toInput)
 
-	if len(actual) != 0 {
+	if actual[0].OriginStart != 10 {
 		t.Fatalf("incorrect length %d", len(actual))
 	}
 }
