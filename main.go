@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"strings"
@@ -26,6 +27,11 @@ func main() {
 	day_5_part_2(string(input))
 }
 
+// Answer: 79753136 | Too high
+// It works for single values, why not ranges?
+// Need more tests
+// I'm seeing negative numbers!!!!!!!!!!!!!!
+
 func day_5_part_2(input string) {
 
 	regex := regexp.MustCompile(`\n\n`)
@@ -33,15 +39,10 @@ func day_5_part_2(input string) {
 	assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
 
 	seedMap := parseSeeds(sections[0])
-	assert(len(seedMap) == 20, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
+	assert(len(seedMap) == 10, fmt.Sprintf("Seeds map length incorrect: %d", len(seedMap)))
 
 	// This can be converted into a loop
 	seedToSoilMap := parseMap(sections[1])
-
-	soil := getDestinationMaps(seedMap, seedToSoilMap)
-
-	println(len(soil))
-
 	soilToFertilizerMap := parseMap(sections[2])
 	fertilizerToWater := parseMap(sections[3])
 	waterToLight := parseMap(sections[4])
@@ -49,21 +50,15 @@ func day_5_part_2(input string) {
 	temperatureToHumidity := parseMap(sections[6])
 	humidityToLocation := parseMap(sections[7])
 
+	soil := getDestinationMaps(seedMap, seedToSoilMap)
 	fertilizer := getDestinationMaps(soil, soilToFertilizerMap)
-	println(len(fertilizer))
 	water := getDestinationMaps(fertilizer, fertilizerToWater)
-	println(len(water))
 	light := getDestinationMaps(water, waterToLight)
-	println(len(light))
 	temp := getDestinationMaps(light, lightToTemperature)
-	println(len(temp))
 	humidity := getDestinationMaps(temp, temperatureToHumidity)
-	println(len(humidity))
 	location := getDestinationMaps(humidity, humidityToLocation)
-	println(len(location))
 
-	// TODO: Use a built in funciton or const to get max here
-	lowest := 999999999999999999
+	lowest := math.MaxInt
 	for i := 0; i < len(location); i++ {
 		if location[i].OriginStart < lowest {
 			lowest = location[i].OriginStart
@@ -97,8 +92,6 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 			},
 		}
 	}
-
-	// TODO: How can I handle cases where there is no match and I need to return the toMap itself?
 
 	for i := 0; i < len(toMaps); i++ {
 		originStart := max(fromMap.OriginStart, toMaps[i].OriginStart)
