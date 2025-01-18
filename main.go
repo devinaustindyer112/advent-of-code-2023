@@ -61,6 +61,16 @@ func day_5_part_2(input string) {
 	println(len(humidity))
 	location := getDestinationMaps(humidity, humidityToLocation)
 	println(len(location))
+
+	// TODO: Use a built in funciton or const to get max here
+	lowest := 999999999999999999
+	for i := 0; i < len(location); i++ {
+		if location[i].OriginStart < lowest {
+			lowest = location[i].OriginStart
+		}
+	}
+
+	println(lowest)
 }
 
 func getDestinationMaps(fromMaps []MapEntry, toMaps []MapEntry) []MapEntry {
