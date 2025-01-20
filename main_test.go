@@ -4,6 +4,8 @@ import (
 	"testing"
 )
 
+// TODO: Right test cases to test all possible branches
+
 func TestGetDestinationMatchLeft(t *testing.T) {
 
 	fromInput := MapEntry{
@@ -93,7 +95,7 @@ func TestGetDestinationMapMatchMiddle(t *testing.T) {
 		{
 			OriginStart:      5,
 			DestinationStart: 20,
-			RangeLength:      10,
+			RangeLength:      5,
 		},
 	}
 
@@ -103,8 +105,12 @@ func TestGetDestinationMapMatchMiddle(t *testing.T) {
 		t.Fatalf("incorrect origin %d", actual[0].OriginStart)
 	}
 
-	if actual[0].RangeLength != 10 {
+	if actual[0].RangeLength != 5 {
 		t.Fatalf("incorrect range length %d", actual[0].RangeLength)
+	}
+
+	if len(actual) != 3 {
+		t.Fatalf("incorrect  length %d", actual[0].RangeLength)
 	}
 
 }
@@ -189,6 +195,32 @@ func TestGetDestinationMapNoMatchRight(t *testing.T) {
 	actual := getDestinationMap(fromInput, toInput)
 
 	if actual[0].OriginStart != 10 {
+		t.Fatalf("incorrect length %d", len(actual))
+	}
+}
+
+func TestGetDestinationMapRangeOne(t *testing.T) {
+
+	fromInput := MapEntry{
+		OriginStart: 1,
+		RangeLength: 1,
+	}
+
+	toInput := []MapEntry{
+		{
+			OriginStart:      1,
+			DestinationStart: 12,
+			RangeLength:      2,
+		},
+	}
+
+	actual := getDestinationMap(fromInput, toInput)
+
+	if actual[0].OriginStart != 12 {
+		t.Fatalf("incorrect length %d", len(actual))
+	}
+
+	if actual[0].RangeLength != 1 {
 		t.Fatalf("incorrect length %d", len(actual))
 	}
 }

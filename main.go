@@ -18,19 +18,13 @@ func (m MapEntry) originEnd() int {
 	return m.OriginStart + m.RangeLength
 }
 
-func (m MapEntry) destinationEnd() int {
-	return m.DestinationStart + m.RangeLength
-}
-
 func main() {
 	input, _ := os.ReadFile("./input.txt")
 	day_5_part_2(string(input))
 }
 
 // Answer: 79753136 | Too high
-// It works for single values, why not ranges?
-// Need more tests
-// I'm seeing negative numbers!!!!!!!!!!!!!!
+// Answer: 67893627 | Too high
 
 func day_5_part_2(input string) {
 
@@ -108,7 +102,7 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 
 			right := MapEntry{
 				OriginStart: originEnd + 1,
-				RangeLength: fromMap.destinationEnd() - originEnd,
+				RangeLength: fromMap.originEnd() - originEnd,
 			}
 
 			left := MapEntry{
@@ -119,7 +113,7 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 			newMap := toMaps[1:]
 
 			// 1. All matches are on the left side
-			if fromMap.OriginStart == originStart && fromMap.destinationEnd() > originEnd {
+			if fromMap.OriginStart == originStart && fromMap.originEnd() > originEnd {
 				destinationMap = append(destinationMap, getDestinationMap(right, newMap)...)
 				return destinationMap
 			}
