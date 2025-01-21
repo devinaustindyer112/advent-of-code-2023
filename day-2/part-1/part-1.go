@@ -1,10 +1,8 @@
-package day_2
+package day_2_part_1
 
 import (
 	"bufio"
-	"fmt"
 	"log"
-	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -18,28 +16,30 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(file)
-	sum := 0.0
+	sum := 0
 
 	for i := 1; scanner.Scan(); i++ {
 		game := parseGame(scanner.Text())
-		power := game["red"] * game["blue"] * game["green"]
-		sum += power
+		if isValid(game) {
+			println(i)
+			sum += i
+		}
 	}
 
-	fmt.Printf("%f\n", sum)
+	print(sum)
 }
 
-func parseGame(line string) map[string]float64 {
+func parseGame(line string) map[string]int {
 
 	gameString := line[strings.Index(line, ":"):]
 	rounds := strings.Split(gameString, ";")
-	roundsMap := map[string]float64{}
+	roundsMap := map[string]int{}
 
 	for _, round := range rounds {
 		drawsMap := parseRound(round)
-		roundsMap["red"] = math.Max(float64(roundsMap["red"]), float64(drawsMap["red"]))
-		roundsMap["blue"] = math.Max(float64(roundsMap["blue"]), float64(drawsMap["blue"]))
-		roundsMap["green"] = math.Max(float64(roundsMap["green"]), float64(drawsMap["green"]))
+		roundsMap["red"] = roundsMap["red"] + drawsMap["red"]
+		roundsMap["blue"] = roundsMap["blue"] + drawsMap["blue"]
+		roundsMap["green"] = roundsMap["green"] + drawsMap["green"]
 	}
 
 	return roundsMap
@@ -64,3 +64,5 @@ func parseRound(round string) map[string]int {
 func isValid(game map[string]int) bool {
 	return game["red"] <= 12 && game["green"] <= 13 && game["blue"] <= 14
 }
+
+// Which games possible with only 12 red cubes, 13 green cubes, and 14 blue cubes?

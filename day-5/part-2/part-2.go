@@ -1,6 +1,7 @@
-package main
+package day_5_part_2
 
 import (
+	"fmt"
 	"math"
 	"os"
 	"regexp"
@@ -28,6 +29,8 @@ func day_5_part_2(input string) {
 
 	regex := regexp.MustCompile(`\n\n`)
 	sections := regex.Split(input, -1)
+	utils.Assert(len(sections) == 8, fmt.Sprintf("Sections length incorrect: %d", len(sections)))
+
 	value := parseSeeds(sections[0])
 
 	for i := 1; i < len(sections); i++ {

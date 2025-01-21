@@ -1,11 +1,11 @@
-package main
+package utils
 
 import (
 	"fmt"
 	"strconv"
 )
 
-func assert(condition bool, errMessage string) {
+func Assert(condition bool, errMessage string) {
 
 	if !condition {
 		panic(errMessage)
@@ -13,7 +13,7 @@ func assert(condition bool, errMessage string) {
 
 }
 
-func parseInt(str string) int {
+func ParseInt(str string) int {
 	value, err := strconv.Atoi(str)
 
 	if err != nil {
