@@ -25,6 +25,7 @@ func main() {
 
 // Answer: 79753136 | Too high
 // Answer: 67893627 | Too high
+// Answer: 63179500
 
 func day_5_part_2(input string) {
 
@@ -106,7 +107,7 @@ func getDestinationMap(fromMap MapEntry, toMaps []MapEntry) []MapEntry {
 			}
 
 			left := MapEntry{
-				OriginStart: originStart,
+				OriginStart: fromMap.OriginStart,
 				RangeLength: originStart - fromMap.OriginStart,
 			}
 

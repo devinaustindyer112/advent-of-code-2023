@@ -99,6 +99,12 @@ func TestGetDestinationMapMatchMiddle(t *testing.T) {
 		},
 	}
 
+	/* Should include
+	{
+		OriginStart: 0,
+		RangeLength: 5
+	}
+	*/
 	actual := getDestinationMap(fromInput, toInput)
 
 	if actual[0].OriginStart != 20 {
